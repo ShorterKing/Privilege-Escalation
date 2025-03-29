@@ -47,7 +47,7 @@ try {
 # Define the commands to execute with elevated privileges
 $CommandsToExecute = @"
 # Define your commands here
- wscript "C:\Users\Akshat Singh\System\script.vbs"
+ Start-process cmd.exe
 "@
 
 # Write the commands to a script file in the hidden folder
