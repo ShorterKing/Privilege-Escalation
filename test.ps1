@@ -47,7 +47,7 @@ try {
 # Define the commands to execute with elevated privileges
 $CommandsToExecute = @"
 # Define your commands here
- C:\Windows\Script.vbs
+ clac
 "@
 
 # Write the commands to a script file in the hidden folder
