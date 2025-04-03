@@ -1,7 +1,3 @@
-Sure! Here’s a well-structured README with sections, a professional tone, and the disclaimer at the end.  
-
----
-
 # 🔑 Privilege Escalation Techniques for Windows 11  
 
 ## 📌 About  
